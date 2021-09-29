@@ -3,7 +3,6 @@ package com.quicksed.accounting_of_finances_app.service.implementations;
 import com.quicksed.accounting_of_finances_app.dto.account.AccountCreateDto;
 import com.quicksed.accounting_of_finances_app.dto.account.AccountDto;
 import com.quicksed.accounting_of_finances_app.dto.account.AccountUpdateDto;
-import com.quicksed.accounting_of_finances_app.entity.User;
 import com.quicksed.accounting_of_finances_app.service.AccountService;
 import org.springframework.stereotype.Service;
 
