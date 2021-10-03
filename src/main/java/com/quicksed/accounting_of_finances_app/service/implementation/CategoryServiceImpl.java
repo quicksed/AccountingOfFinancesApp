@@ -1,4 +1,4 @@
-package com.quicksed.accounting_of_finances_app.service.implementations;
+package com.quicksed.accounting_of_finances_app.service.implementation;
 
 import com.quicksed.accounting_of_finances_app.dto.category.CategoryCreateDto;
 import com.quicksed.accounting_of_finances_app.dto.category.CategoryDto;

@@ -20,12 +20,12 @@ public class AccountController {
         this.accountService = accountService;
     }
 
-    @GetMapping("/getAccount-{id}")
+    @GetMapping("/getAccount/{id}")
     public AccountDto getAccount(int id) {
         return accountService.getAccountById(id);
     }
 
-    @GetMapping("/getUsersAccounts/user-{userId}")
+    @GetMapping("/getUsersAccounts/user/{userId}")
     public List<AccountDto> getUsersAccounts(int userId) {
         return accountService.getUsersAccounts(userId);
     }
@@ -41,18 +41,19 @@ public class AccountController {
         accountService.createAccount(new AccountCreateDto(
                 accountCreateDto.getName(),
                 accountCreateDto.getDescription(),
-                accountCreateDto.getUser()
+                accountCreateDto.getUser(),
+                accountCreateDto.getCurrency()
         ));
     }
 
-    @PutMapping("/account-{id}")
+    @PutMapping("/account/{id}")
     public void updateAccount(@RequestBody AccountUpdateDto accountUpdateDto,
                               @PathVariable("id") Integer accountId) {
 
         accountService.updateAccount(accountId, accountUpdateDto);
     }
 
-    @DeleteMapping("/delete/account-{id}")
+    @DeleteMapping("/delete/account/{id}")
     public boolean deleteAccount(int id) {
         return accountService.deleteAccount(id);
     }

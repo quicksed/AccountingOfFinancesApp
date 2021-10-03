@@ -20,12 +20,12 @@ public class ItemController {
         this.itemService = itemService;
     }
 
-    @GetMapping("/getItem-{id}")
+    @GetMapping("/getItem/{id}")
     public ItemDto getItem(int id) {
         return itemService.getItem(id);
     }
 
-    @GetMapping("/getUsersItems/user-{userId}")
+    @GetMapping("/getUsersItems/user/{userId}")
     public List<ItemDto> getUsersItems(int userId) {
         return itemService.getUsersItems(userId);
     }
@@ -48,14 +48,14 @@ public class ItemController {
         ));
     }
 
-    @PutMapping("/item-{id}")
+    @PutMapping("/item/{id}")
     public void updateItem(@RequestBody ItemUpdateDto itemUpdateDto,
                                @PathVariable("id") Integer itemId) {
 
         itemService.updateItem(itemId, itemUpdateDto);
     }
 
-    @DeleteMapping("/delete/item-{id}")
+    @DeleteMapping("/delete/item/id}")
     public boolean deleteAccount(int id) {
         return itemService.deleteItem(id);
     }

@@ -20,12 +20,12 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @GetMapping("/getCategory-{id}")
+    @GetMapping("/getCategory/{id}")
     public CategoryDto getCategory(int id) {
         return categoryService.getCategory(id);
     }
 
-    @GetMapping("/getUsersCategory/user-{userId}")
+    @GetMapping("/getUsersCategory/user/{userId}")
     public List<CategoryDto> getUsersCategory(int userId) {
         return categoryService.getUsersCategories(userId);
     }
@@ -45,14 +45,14 @@ public class CategoryController {
         ));
     }
 
-    @PutMapping("/category-{id}")
+    @PutMapping("/category/{id}")
     public void updateCategory(@RequestBody CategoryUpdateDto categoryUpdateDto,
                               @PathVariable("id") Integer categoryId) {
 
         categoryService.updateCategory(categoryId, categoryUpdateDto);
     }
 
-    @DeleteMapping("/delete/category-{id}")
+    @DeleteMapping("/delete/category/{id}")
     public boolean deleteCategory(int id) {
         return categoryService.deleteCategory(id);
     }

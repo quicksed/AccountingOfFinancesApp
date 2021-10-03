@@ -20,7 +20,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/userById/user-{id}")
+    @GetMapping("/userById/user/{id}")
     public UserDto getUserById(int id) {
         return userService.getUserById(id);
     }
@@ -45,7 +45,7 @@ public class UserController {
         return userService.getUserByEmail(userCreateDto.getEmail());
     }
 
-    @PutMapping("/user-{id}")
+    @PutMapping("/user/{id}")
     public UserDto updateUser(@RequestBody UserUpdateDto userUpdateDto,
                               @PathVariable("id") Integer userId) {
 
@@ -54,7 +54,7 @@ public class UserController {
         return userService.getUserById(userId);
     }
 
-    @DeleteMapping("/delete/user-{id}")
+    @DeleteMapping("/delete/user/{id}")
     public boolean deleteUser(int id) {
         return userService.deleteUser(id);
     }
