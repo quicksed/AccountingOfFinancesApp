@@ -5,11 +5,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Account {
+public class Currency {
 
     private int id;
     private String name;
     private String description;
-    private User user;
-    private Currency currency;
+
+    public Currency(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 }
