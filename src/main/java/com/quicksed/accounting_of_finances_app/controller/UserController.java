@@ -32,7 +32,7 @@ public class UserController {
 
     @PostMapping("/createUser")
     public UserDto createUser(@RequestBody UserCreateDto userCreateDto) {
-        return userService.getUserByEmail(userCreateDto.getEmail());
+        return userService.createUser(userCreateDto);
     }
 
     @PutMapping("/user/{id}")

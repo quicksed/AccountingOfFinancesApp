@@ -5,8 +5,8 @@ CREATE TABLE accounting.user
     Surname varchar(255) NOT NULL,
     Email varchar(255) NOT NULL,
     Password varchar(255) NOT NULL,
-    BirthDate timestamptz NOT NULL,
-    RegistrationDate timestamptz NOT NULL DEFAULT now()
+    Birth_Date timestamptz NOT NULL,
+    Registration_Date timestamptz NOT NULL DEFAULT now()
 );
 
 CREATE TABLE accounting.currency
@@ -30,7 +30,7 @@ CREATE TABLE accounting.category
 (
     ID SERIAL PRIMARY KEY,
     Name varchar(255) NOT NULL,
-    CategoryType int NOT NULL,
+    Category_type int NOT NULL,
 
     User_ID int NOT NULL REFERENCES accounting.user(ID)
 );

@@ -22,6 +22,7 @@ public class Item {
 
     private Date date;
 
+    @Column(columnDefinition = "NUMERIC(10,2)")
     private Double value;
 
     private String comment;
