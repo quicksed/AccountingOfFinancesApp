@@ -8,13 +8,13 @@ import java.util.List;
 
 public interface CurrencyService {
 
-    void createCurrency(CurrencyCreateDto currency);
+    CurrencyDto createCurrency(CurrencyCreateDto currency);
 
     CurrencyDto getCurrency(int id);
 
     List<CurrencyDto> getAllCurrency();
 
-    boolean updateCurrency(int id, CurrencyUpdateDto currency);
+    CurrencyDto updateCurrency(int id, CurrencyUpdateDto currency);
 
-    boolean deleteCurrency(int id);
+    void deleteCurrency(int id);
 }

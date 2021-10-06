@@ -36,25 +36,19 @@ public class AccountController {
     }
 
     @PostMapping("/createAccount")
-    public void createAccount(@RequestBody AccountCreateDto accountCreateDto) {
-
-        accountService.createAccount(new AccountCreateDto(
-                accountCreateDto.getName(),
-                accountCreateDto.getDescription(),
-                accountCreateDto.getUser(),
-                accountCreateDto.getCurrency()
-        ));
+    public AccountDto createAccount(@RequestBody AccountCreateDto accountCreateDto) {
+        return accountService.createAccount(accountCreateDto);
     }
 
     @PutMapping("/account/{id}")
-    public void updateAccount(@RequestBody AccountUpdateDto accountUpdateDto,
+    public AccountDto updateAccount(@RequestBody AccountUpdateDto accountUpdateDto,
                               @PathVariable("id") Integer accountId) {
 
-        accountService.updateAccount(accountId, accountUpdateDto);
+        return accountService.updateAccount(accountId, accountUpdateDto);
     }
 
     @DeleteMapping("/delete/account/{id}")
-    public boolean deleteAccount(int id) {
-        return accountService.deleteAccount(id);
+    public void deleteAccount(int id) {
+        accountService.deleteAccount(id);
     }
 }

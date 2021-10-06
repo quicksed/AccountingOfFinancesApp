@@ -32,16 +32,6 @@ public class UserController {
 
     @PostMapping("/createUser")
     public UserDto createUser(@RequestBody UserCreateDto userCreateDto) {
-
-        userService.createUser(new UserCreateDto(
-                userCreateDto.getName(),
-                userCreateDto.getSurname(),
-                userCreateDto.getEmail(),
-                userCreateDto.getPassword(),
-                userCreateDto.getBirthDate(),
-                userCreateDto.getRegistrationDate()
-        ));
-
         return userService.getUserByEmail(userCreateDto.getEmail());
     }
 
@@ -49,13 +39,11 @@ public class UserController {
     public UserDto updateUser(@RequestBody UserUpdateDto userUpdateDto,
                               @PathVariable("id") Integer userId) {
 
-        userService.updateUser(userId, userUpdateDto);
-
-        return userService.getUserById(userId);
+        return userService.updateUser(userId, userUpdateDto);
     }
 
     @DeleteMapping("/delete/user/{id}")
-    public boolean deleteUser(int id) {
-        return userService.deleteUser(id);
+    public void deleteUser(int id) {
+        userService.deleteUser(id);
     }
 }

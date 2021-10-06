@@ -31,23 +31,19 @@ public class CurrencyController {
     }
 
     @PostMapping("/createCurrency")
-    public void createCurrency(@RequestBody CurrencyCreateDto currencyCreateDto) {
-
-        currencyService.createCurrency(new CurrencyCreateDto(
-                currencyCreateDto.getName(),
-                currencyCreateDto.getDescription()
-        ));
+    public CurrencyDto createCurrency(@RequestBody CurrencyCreateDto currencyCreateDto) {
+        return currencyService.createCurrency(currencyCreateDto);
     }
 
     @PutMapping("/currency/{id}")
-    public void updateCurrency(@RequestBody CurrencyUpdateDto currencyUpdateDto,
-                              @PathVariable("id") Integer currencyId) {
+    public CurrencyDto updateCurrency(@RequestBody CurrencyUpdateDto currencyUpdateDto,
+                                      @PathVariable("id") Integer currencyId) {
 
-        currencyService.updateCurrency(currencyId, currencyUpdateDto);
+        return currencyService.updateCurrency(currencyId, currencyUpdateDto);
     }
 
     @DeleteMapping("/delete/currency/{id}")
-    public boolean deleteCurrency(int id) {
-        return currencyService.deleteCurrency(id);
+    public void deleteCurrency(int id) {
+        currencyService.deleteCurrency(id);
     }
 }

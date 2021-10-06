@@ -25,38 +25,25 @@ public class ItemController {
         return itemService.getItem(id);
     }
 
-    @GetMapping("/getUsersItems/user/{userId}")
-    public List<ItemDto> getUsersItems(int userId) {
-        return itemService.getUsersItems(userId);
-    }
-
     @GetMapping("/getAllItems")
     public List<ItemDto> getAllItems() {
         return itemService.getAllItems();
     }
 
     @PostMapping("/createItem")
-    public void createItem(@RequestBody ItemDto createItemDto) {
-
-        itemService.createItem(new ItemCreateDto(
-                createItemDto.getName(),
-                createItemDto.getDate(),
-                createItemDto.getValue(),
-                createItemDto.getComment(),
-                createItemDto.getAccount(),
-                createItemDto.getCategory()
-        ));
+    public ItemDto createItem(@RequestBody ItemCreateDto createItemDto) {
+        return itemService.createItem(createItemDto);
     }
 
     @PutMapping("/item/{id}")
-    public void updateItem(@RequestBody ItemUpdateDto itemUpdateDto,
-                               @PathVariable("id") Integer itemId) {
+    public ItemDto updateItem(@RequestBody ItemUpdateDto itemUpdateDto,
+                              @PathVariable("id") Integer itemId) {
 
-        itemService.updateItem(itemId, itemUpdateDto);
+        return itemService.updateItem(itemId, itemUpdateDto);
     }
 
     @DeleteMapping("/delete/item/id}")
-    public boolean deleteAccount(int id) {
-        return itemService.deleteItem(id);
+    public void deleteAccount(int id) {
+        itemService.deleteItem(id);
     }
 }
