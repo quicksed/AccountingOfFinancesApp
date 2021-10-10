@@ -1,5 +1,6 @@
 package com.quicksed.accounting_of_finances_app.controller;
 
+import com.quicksed.accounting_of_finances_app.annotation.Loggable;
 import com.quicksed.accounting_of_finances_app.dto.item.ItemCreateDto;
 import com.quicksed.accounting_of_finances_app.dto.item.ItemDto;
 import com.quicksed.accounting_of_finances_app.dto.item.ItemUpdateDto;
@@ -20,28 +21,33 @@ public class ItemController {
         this.itemService = itemService;
     }
 
+    @Loggable
     @GetMapping("/getItem/{id}")
     public ItemDto getItem(int id) {
         return itemService.getItem(id);
     }
 
+    @Loggable
     @GetMapping("/getAllItems")
     public List<ItemDto> getAllItems() {
         return itemService.getAllItems();
     }
 
+    @Loggable
     @PostMapping("/createItem")
     public ItemDto createItem(@RequestBody ItemCreateDto createItemDto) {
         return itemService.createItem(createItemDto);
     }
 
-    @PutMapping("/item/{id}")
+    @Loggable
+    @PutMapping("/update/item/{id}")
     public ItemDto updateItem(@RequestBody ItemUpdateDto itemUpdateDto,
                               @PathVariable("id") Integer itemId) {
 
         return itemService.updateItem(itemId, itemUpdateDto);
     }
 
+    @Loggable
     @DeleteMapping("/delete/item/id}")
     public void deleteAccount(int id) {
         itemService.deleteItem(id);
