@@ -9,7 +9,10 @@ import com.quicksed.accounting_of_finances_app.service.UserService;
 import com.quicksed.accounting_of_finances_app.service.factory.UserFactory;
 import com.quicksed.accounting_of_finances_app.service.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,6 +30,8 @@ public class UserServiceImpl implements UserService {
         this.userFactory = userFactory;
     }
 
+    @Retryable(IllegalArgumentException.class)
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public UserDto createUser(UserCreateDto userCreateDto) {
         User user = userFactory.build(
@@ -41,24 +46,29 @@ public class UserServiceImpl implements UserService {
         return userMapper.mapUserToUserDto(user);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public UserDto getUserById(int id) {
         User user = userRepository.findById(id).orElseThrow();
         return userMapper.mapUserToUserDto(user);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public UserDto getUserByEmail(String email) {
         User user = userRepository.findByEmail(email);
         return userMapper.mapUserToUserDto(user);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public List<UserDto> getAllUsers() {
         List<User> users = userRepository.findAll();
         return userMapper.mapUserToUserDto(users);
     }
 
+    @Retryable(IllegalArgumentException.class)
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public UserDto updateUser(int id, UserUpdateDto userUpdateDto) {
         User user = userRepository.findById(id).orElseThrow();
@@ -71,6 +81,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.mapUserToUserDto(user);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public void deleteUser(int id) {
         User user = userRepository.findById(id).orElseThrow();
