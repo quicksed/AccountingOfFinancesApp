@@ -3,7 +3,12 @@ package com.quicksed.accounting_of_finances_app.service.implementation;
 import com.quicksed.accounting_of_finances_app.dto.category.CategoryCreateDto;
 import com.quicksed.accounting_of_finances_app.dto.category.CategoryDto;
 import com.quicksed.accounting_of_finances_app.dto.category.CategoryUpdateDto;
+import com.quicksed.accounting_of_finances_app.entity.Category;
+import com.quicksed.accounting_of_finances_app.repository.CategoryRepository;
 import com.quicksed.accounting_of_finances_app.service.CategoryService;
+import com.quicksed.accounting_of_finances_app.service.factory.CategoryFactory;
+import com.quicksed.accounting_of_finances_app.service.mapper.CategoryMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,33 +16,63 @@ import java.util.List;
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
-    @Override
-    public void createCategory(CategoryCreateDto category) {
+    private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
+    private final CategoryFactory categoryFactory;
 
+    @Autowired
+    public CategoryServiceImpl(CategoryRepository categoryRepository, CategoryMapper categoryMapper, CategoryFactory categoryFactory) {
+        this.categoryRepository = categoryRepository;
+        this.categoryMapper = categoryMapper;
+        this.categoryFactory = categoryFactory;
+    }
+
+    @Override
+    public CategoryDto createCategory(CategoryCreateDto categoryCreateDto) {
+
+        Category category = categoryFactory.build(
+                categoryCreateDto.getName(),
+                categoryCreateDto.getCategoryType().getId(),
+                categoryCreateDto.getUserId()
+        );
+
+        category = categoryRepository.saveAndFlush(category);
+        return categoryMapper.mapCategoryToCategoryDto(category);
     }
 
     @Override
     public CategoryDto getCategory(int id) {
-        return null;
+        Category category = categoryRepository.findById(id).orElseThrow();
+        return categoryMapper.mapCategoryToCategoryDto(category);
     }
 
     @Override
     public List<CategoryDto> getUsersCategories(int userId) {
-        return null;
+        List<Category> categories = categoryRepository.findByUserId(userId);
+        return categoryMapper.mapCategoryToCategoryDto(categories);
     }
 
     @Override
     public List<CategoryDto> getAllCategories() {
-        return null;
+        List<Category> categories = categoryRepository.findAll();
+        return categoryMapper.mapCategoryToCategoryDto(categories);
     }
 
     @Override
-    public boolean updateCategory(int id, CategoryUpdateDto category) {
-        return false;
+    public CategoryDto updateCategory(int id, CategoryUpdateDto categoryUpdateDto) {
+        Category category = categoryRepository.findById(id).orElseThrow();
+
+        category.setName(categoryUpdateDto.getName());
+        category.setCategoryType(categoryUpdateDto.getCategoryType().getId());
+
+        categoryRepository.saveAndFlush(category);
+        return categoryMapper.mapCategoryToCategoryDto(category);
     }
 
     @Override
-    public boolean deleteCategory(int id) {
-        return false;
+    public void deleteCategory(int id) {
+        Category category = categoryRepository.findById(id).orElseThrow();
+
+        categoryRepository.delete(category);
     }
 }

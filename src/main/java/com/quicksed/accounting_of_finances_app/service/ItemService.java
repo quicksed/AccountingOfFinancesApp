@@ -8,15 +8,13 @@ import java.util.List;
 
 public interface ItemService {
 
-    void createItem(ItemCreateDto item);
+    ItemDto createItem(ItemCreateDto item);
 
     ItemDto getItem(int id);
 
-    List<ItemDto> getUsersItems(int userId);
-
     List<ItemDto> getAllItems();
 
-    boolean updateItem(int id, ItemUpdateDto item);
+    ItemDto updateItem(int id, ItemUpdateDto item);
 
-    boolean deleteItem(int id);
+    void deleteItem(int id);
 }

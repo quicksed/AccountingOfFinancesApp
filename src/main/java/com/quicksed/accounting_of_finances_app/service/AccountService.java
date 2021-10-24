@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface AccountService {
 
-    void createAccount(AccountCreateDto account);
+    AccountDto createAccount(AccountCreateDto account);
 
     AccountDto getAccountById(int id);
 
@@ -16,7 +16,7 @@ public interface AccountService {
 
     List<AccountDto> getUsersAccounts(int userId);
 
-    boolean updateAccount(int id, AccountUpdateDto account);
+    AccountDto updateAccount(int id, AccountUpdateDto account);
 
-    boolean deleteAccount(int id);
+    void deleteAccount(int id);
 }

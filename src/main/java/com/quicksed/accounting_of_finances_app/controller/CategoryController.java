@@ -36,24 +36,19 @@ public class CategoryController {
     }
 
     @PostMapping("/createCategory")
-    public void createCategory(@RequestBody CategoryCreateDto categoryCreateDto) {
-
-        categoryService.createCategory(new CategoryCreateDto(
-                categoryCreateDto.getName(),
-                categoryCreateDto.getCategoryType(),
-                categoryCreateDto.getUser()
-        ));
+    public CategoryDto createCategory(@RequestBody CategoryCreateDto categoryCreateDto) {
+        return categoryService.createCategory(categoryCreateDto);
     }
 
     @PutMapping("/category/{id}")
-    public void updateCategory(@RequestBody CategoryUpdateDto categoryUpdateDto,
-                              @PathVariable("id") Integer categoryId) {
+    public CategoryDto updateCategory(@RequestBody CategoryUpdateDto categoryUpdateDto,
+                               @PathVariable("id") Integer categoryId) {
 
-        categoryService.updateCategory(categoryId, categoryUpdateDto);
+        return categoryService.updateCategory(categoryId, categoryUpdateDto);
     }
 
     @DeleteMapping("/delete/category/{id}")
-    public boolean deleteCategory(int id) {
-        return categoryService.deleteCategory(id);
+    public void deleteCategory(int id) {
+        categoryService.deleteCategory(id);
     }
 }

@@ -1,8 +1,6 @@
 package com.quicksed.accounting_of_finances_app.dto.account;
 
-import com.quicksed.accounting_of_finances_app.dto.currency.CurrencyDto;
-import com.quicksed.accounting_of_finances_app.dto.user.UserDto;
-import com.quicksed.accounting_of_finances_app.entity.Currency;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
 @Getter
@@ -10,13 +8,16 @@ public class AccountCreateDto {
 
     private final String name;
     private final String description;
-    private final UserDto user;
-    private final CurrencyDto currency;
+    private final Integer userId;
+    private final Integer currencyId;
 
-    public AccountCreateDto(String name, String description, UserDto user, CurrencyDto currency) {
+    public AccountCreateDto(@JsonProperty("name") String name,
+                            @JsonProperty("description") String description,
+                            @JsonProperty("userId") Integer userId,
+                            @JsonProperty("currencyId") Integer currencyId) {
         this.name = name;
         this.description = description;
-        this.user = user;
-        this.currency = currency;
+        this.userId = userId;
+        this.currencyId = currencyId;
     }
 }
