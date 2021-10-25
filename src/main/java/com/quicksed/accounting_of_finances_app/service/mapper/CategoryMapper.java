@@ -16,10 +16,8 @@ public class CategoryMapper {
         return new CategoryDto(
                 model.getId(),
                 model.getName(),
-                (model.getCategoryType() == 1)
-                        ? CategoryType.Income
-                        : CategoryType.Consumption,
-                model.getUserId()
+                model.getCategoryType(),
+                model.getUser().getId()
         );
     }
 

@@ -1,9 +1,11 @@
 package com.quicksed.accounting_of_finances_app.entity;
 
+import com.quicksed.accounting_of_finances_app.enums.CategoryType;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -19,17 +21,22 @@ public class Category {
 
     private String name;
 
-    private Integer categoryType;
+    private CategoryType categoryType;
 
-    private Integer userId;
+    @OneToMany(mappedBy = "category")
+    private Set<Item> items;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", updatable = false)
+    private User user;
 
     public Category() {
 
     }
 
-    public Category(String name, Integer categoryType, Integer userId) {
+    public Category(String name, CategoryType categoryType, User user) {
         this.name = name;
         this.categoryType = categoryType;
-        this.userId = userId;
+        this.user = user;
     }
 }

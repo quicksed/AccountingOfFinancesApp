@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -21,18 +22,25 @@ public class Account {
 
     private String description;
 
-    private Integer userId;
+    @OneToMany(mappedBy = "account")
+    private Set<Item> items;
 
-    private Integer currencyId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", updatable = false)
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "currency_id", updatable = false)
+    private Currency currency;
 
     public Account() {
 
     }
 
-    public Account(String name, String description, Integer userId, Integer currencyId) {
+    public Account(String name, String description, User user, Currency currency) {
         this.name = name;
         this.description = description;
-        this.userId = userId;
-        this.currencyId = currencyId;
+        this.user = user;
+        this.currency = currency;
     }
 }

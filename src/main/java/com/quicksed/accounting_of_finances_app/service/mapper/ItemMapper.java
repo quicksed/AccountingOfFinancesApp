@@ -18,8 +18,8 @@ public class ItemMapper {
                 model.getDate(),
                 model.getValue(),
                 model.getComment(),
-                model.getAccountId(),
-                model.getCategoryId()
+                model.getAccount().getId(),
+                model.getCategory().getId()
         );
     }
 
