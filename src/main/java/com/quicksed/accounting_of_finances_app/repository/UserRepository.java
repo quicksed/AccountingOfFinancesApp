@@ -1,5 +1,6 @@
 package com.quicksed.accounting_of_finances_app.repository;
 
+import com.quicksed.accounting_of_finances_app.dto.user.UserDto;
 import com.quicksed.accounting_of_finances_app.entity.User;
 import com.quicksed.accounting_of_finances_app.entity.projection.UserIdProjection;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -18,6 +19,9 @@ public interface UserRepository extends
     Optional<User> findByEmail(String email);
 
     UserIdProjection findUserByEmail(String email);
+
+    @EntityGraph("User.roles")
+    Optional<User> findUserWithRolesByEmail(String email);
 
     @EntityGraph("User.roles")
     @Query("select u from User u")

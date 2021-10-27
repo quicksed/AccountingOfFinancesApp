@@ -1,5 +1,6 @@
 package com.quicksed.accounting_of_finances_app.service.implementation;
 
+import com.quicksed.accounting_of_finances_app.dto.authentication.UserAuthenticationInfoDto;
 import com.quicksed.accounting_of_finances_app.dto.user.UserCreateDto;
 import com.quicksed.accounting_of_finances_app.dto.user.UserDto;
 import com.quicksed.accounting_of_finances_app.dto.user.UserUpdateDto;
@@ -7,6 +8,7 @@ import com.quicksed.accounting_of_finances_app.dto.user.UserWithRolesDto;
 import com.quicksed.accounting_of_finances_app.dto.user.filter.UserFilterDto;
 import com.quicksed.accounting_of_finances_app.entity.Role;
 import com.quicksed.accounting_of_finances_app.entity.User;
+import com.quicksed.accounting_of_finances_app.helper.OptionalChecker;
 import com.quicksed.accounting_of_finances_app.repository.RoleRepository;
 import com.quicksed.accounting_of_finances_app.repository.UserRepository;
 import com.quicksed.accounting_of_finances_app.repository.specification.UserSpecification;
@@ -25,6 +27,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -67,40 +70,32 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public UserWithRolesDto getUserById(int id) throws NotFoundException {
-        Optional<User> user = userRepository.findById(id);
+        Optional<User> userOptional = userRepository.findById(id);
+        User user = OptionalChecker.checkOptional(userOptional);
 
-        if (user.isEmpty()) {
-            throw new NotFoundException("User not found!");
-        }
-
-        return userMapper.mapUserToUserWithRolesDto(user.get());
+        return userMapper.mapUserToUserWithRolesDto(user);
     }
 
     @Retryable(NotFoundException.class)
     @Transactional
     @Override
     public UserWithRolesDto getUserByEmail(String email) throws NotFoundException {
-        Optional<User> user = userRepository.findByEmail(email);
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        User user = OptionalChecker.checkOptional(userOptional);
 
-        if (user.isEmpty()) {
-            throw new NotFoundException("User not found!");
-        }
-
-        return userMapper.mapUserToUserWithRolesDto(user.get());
+        return userMapper.mapUserToUserWithRolesDto(user);
     }
 
     @Transactional
     @Override
     public void editRole(Integer userId, Collection<String> roleCodes) throws NotFoundException {
-        Optional<User> user = userRepository.findById(userId);
+        Optional<User> userOptional = userRepository.findById(userId);
+        User user = OptionalChecker.checkOptional(userOptional);
+
         Set<Role> newRoles = roleRepository.findAllByCodeIn(roleCodes);
 
-        if (user.isEmpty()) {
-            throw new NotFoundException("User not found!");
-        }
-
-        user.get().setRoles(newRoles);
-        userRepository.save(user.get());
+        user.setRoles(newRoles);
+        userRepository.save(user);
     }
 
     @Override
@@ -121,12 +116,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUser(int id, UserUpdateDto userUpdateDto) throws NotFoundException {
         Optional<User> userOptional = userRepository.findById(id);
-
-        if (userOptional.isEmpty()) {
-            throw new NotFoundException("User not found!");
-        }
-
-        User user = userOptional.get();
+        User user = OptionalChecker.checkOptional(userOptional);
 
         user.setName(userUpdateDto.getName());
         user.setSurname(userUpdateDto.getSurname());
@@ -140,12 +130,26 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void deleteUser(int id) throws NotFoundException {
-        Optional<User> user = userRepository.findById(id);
+        Optional<User> userOptional = userRepository.findById(id);
+        User user = OptionalChecker.checkOptional(userOptional);
 
-        if (user.isEmpty()) {
-            throw new NotFoundException("User not found!");
+        userRepository.delete(user);
+    }
+
+    @Override
+    public Optional<UserAuthenticationInfoDto> findAuthenticationInfo(String email) {
+        Optional<User> userOptional = userRepository.findUserWithRolesByEmail(email);
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            return Optional.of(new UserAuthenticationInfoDto(
+                    user.getId(),
+                    user.getEmail(),
+                    user.getPassword(),
+                    user.getRoles().stream().map(Role::getCode).collect(Collectors.toSet())
+            ));
+        } else {
+            return Optional.empty();
         }
-
-        userRepository.delete(user.get());
     }
 }

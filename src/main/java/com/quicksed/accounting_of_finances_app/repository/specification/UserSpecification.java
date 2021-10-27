@@ -29,11 +29,14 @@ public class UserSpecification {
 
             for (var filter : filters) {
                 switch (filter.getUserField()) {
-                    case ID -> predicates.add(criteriaBuilder.in(root.get("id")));
+                    case ID -> {
+                        Set<Integer> ids = filter.getValues().stream().map(Integer::parseInt).collect(Collectors.toSet());
+                        predicates.add(criteriaBuilder.in(root.get("id")).value(ids));
+                    }
 
-                    case EMAIL -> predicates.add(criteriaBuilder.in(root.get("email")));
+                    case EMAIL -> predicates.add(criteriaBuilder.in(root.get("email")).value(filter.getValues()));
 
-                    case ROLES -> predicates.add(criteriaBuilder.in(rolesJoin.get("code")));
+                    case ROLES -> predicates.add(criteriaBuilder.in(rolesJoin.get("code")).value(filter.getValues()));
 
                     default -> throw new IllegalArgumentException();
                 }
