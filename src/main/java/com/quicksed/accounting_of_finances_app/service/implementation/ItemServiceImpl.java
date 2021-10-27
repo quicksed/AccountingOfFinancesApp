@@ -13,7 +13,10 @@ import com.quicksed.accounting_of_finances_app.service.factory.ItemFactory;
 import com.quicksed.accounting_of_finances_app.service.mapper.AccountMapper;
 import com.quicksed.accounting_of_finances_app.service.mapper.ItemMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -31,6 +34,8 @@ public class ItemServiceImpl implements ItemService {
         this.itemFactory = itemFactory;
     }
 
+    @Retryable(IllegalArgumentException.class)
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public ItemDto createItem(ItemCreateDto itemCreateDto) {
 
@@ -47,18 +52,21 @@ public class ItemServiceImpl implements ItemService {
         return itemMapper.mapItemToItemDto(item);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public ItemDto getItem(int id) {
         Item item = itemRepository.findById(id).orElseThrow();
         return itemMapper.mapItemToItemDto(item);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public List<ItemDto> getAllItems() {
         List<Item> items = itemRepository.findAll();
         return itemMapper.mapItemToItemDto(items);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public ItemDto updateItem(int id, ItemUpdateDto itemUpdateDto) {
         Item item = itemRepository.findById(id).orElseThrow();
@@ -72,6 +80,7 @@ public class ItemServiceImpl implements ItemService {
         return itemMapper.mapItemToItemDto(item);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public void deleteItem(int id) {
         Item item = itemRepository.findById(id).orElseThrow();

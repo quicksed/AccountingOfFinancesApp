@@ -9,7 +9,10 @@ import com.quicksed.accounting_of_finances_app.service.CategoryService;
 import com.quicksed.accounting_of_finances_app.service.factory.CategoryFactory;
 import com.quicksed.accounting_of_finances_app.service.mapper.CategoryMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,6 +30,8 @@ public class CategoryServiceImpl implements CategoryService {
         this.categoryFactory = categoryFactory;
     }
 
+    @Retryable(IllegalArgumentException.class)
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public CategoryDto createCategory(CategoryCreateDto categoryCreateDto) {
 
@@ -40,24 +45,29 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryMapper.mapCategoryToCategoryDto(category);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public CategoryDto getCategory(int id) {
         Category category = categoryRepository.findById(id).orElseThrow();
         return categoryMapper.mapCategoryToCategoryDto(category);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public List<CategoryDto> getUsersCategories(int userId) {
         List<Category> categories = categoryRepository.findByUserId(userId);
         return categoryMapper.mapCategoryToCategoryDto(categories);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public List<CategoryDto> getAllCategories() {
         List<Category> categories = categoryRepository.findAll();
         return categoryMapper.mapCategoryToCategoryDto(categories);
     }
 
+    @Retryable(IllegalArgumentException.class)
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public CategoryDto updateCategory(int id, CategoryUpdateDto categoryUpdateDto) {
         Category category = categoryRepository.findById(id).orElseThrow();
@@ -69,6 +79,7 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryMapper.mapCategoryToCategoryDto(category);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public void deleteCategory(int id) {
         Category category = categoryRepository.findById(id).orElseThrow();

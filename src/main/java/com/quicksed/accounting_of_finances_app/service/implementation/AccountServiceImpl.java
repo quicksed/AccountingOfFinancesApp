@@ -9,7 +9,10 @@ import com.quicksed.accounting_of_finances_app.service.AccountService;
 import com.quicksed.accounting_of_finances_app.service.factory.AccountFactory;
 import com.quicksed.accounting_of_finances_app.service.mapper.AccountMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,6 +30,8 @@ public class AccountServiceImpl implements AccountService {
         this.accountFactory = accountFactory;
     }
 
+    @Retryable(IllegalArgumentException.class)
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public AccountDto createAccount(AccountCreateDto accountCreateDto) {
 
@@ -41,24 +46,29 @@ public class AccountServiceImpl implements AccountService {
         return accountMapper.mapAccountToAccountDto(account);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public AccountDto getAccountById(int id) {
         Account account = accountRepository.findById(id).orElseThrow();
         return accountMapper.mapAccountToAccountDto(account);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public List<AccountDto> getUsersAccounts(int userId) {
         List<Account> accounts = accountRepository.findByUserId(userId);
         return accountMapper.mapAccountToAccountDto(accounts);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public List<AccountDto> getAllAccounts() {
         List<Account> accounts = accountRepository.findAll();
         return accountMapper.mapAccountToAccountDto(accounts);
     }
 
+    @Retryable(IllegalArgumentException.class)
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public AccountDto updateAccount(int id, AccountUpdateDto accountUpdate) {
         Account account = accountRepository.findById(id).orElseThrow();
@@ -70,6 +80,7 @@ public class AccountServiceImpl implements AccountService {
         return accountMapper.mapAccountToAccountDto(account);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public void deleteAccount(int id) {
         Account account = accountRepository.findById(id).orElseThrow();
