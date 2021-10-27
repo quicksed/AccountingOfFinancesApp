@@ -27,20 +27,25 @@ public class Item {
 
     private String comment;
 
-    private Integer accountId;
+    @ManyToOne
+    @JoinColumn(name = "account_id")
+    private Account account;
 
-    private Integer categoryId;
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
 
     public Item() {
 
     }
 
-    public Item(String name, Date date, Double value, String comment, Integer accountId, Integer categoryId) {
+    public Item(String name, Date date, Double value, String comment, Account account, Category category) {
         this.name = name;
         this.date = date;
         this.value = value;
         this.comment = comment;
-        this.accountId = accountId;
-        this.categoryId = categoryId;
+        this.account = account;
+        this.category = category;
     }
 }

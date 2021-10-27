@@ -13,8 +13,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoggingAspect {
 
-    @Before("@annotation(loggable)")
-    public void loggable(JoinPoint joinPoint, Loggable loggable) {
+    @Before("execution(public * *(..)) && within(@org.springframework.web.bind.annotation.RestController *) " +
+            "&& within(@com.quicksed.accounting_of_finances_app.annotation.Loggable *)")
+    public void loggable(JoinPoint joinPoint){
         System.out.println("Выполняется: " + joinPoint.getSignature().getName());
     }
 
@@ -31,6 +32,6 @@ public class LoggingAspect {
     @AfterThrowing("execution(public * *(..)) " +
             "&& within(@org.springframework.web.bind.annotation.RestController *)")
     public void afterThrowingLogAdvice(JoinPoint joinPoint) {
-        System.out.println("Метод " + joinPoint.getSignature().getName() + "выбросил исключение");
+        System.out.println("Метод " + joinPoint.getSignature().getName() + " выбросил исключение");
     }
 }

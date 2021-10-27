@@ -13,7 +13,9 @@ CREATE TABLE accounting.currency
 (
     ID SERIAL PRIMARY KEY,
     Name varchar(255) NOT NULL,
-    Description varchar(255) NOT NULL
+    Description varchar(255),
+
+    User_ID int NOT NULL REFERENCES accounting.user(ID)
 );
 
 CREATE TABLE accounting.account

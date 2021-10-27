@@ -15,7 +15,8 @@ public class AccountMapper {
         return new AccountDto(
                 model.getId(),
                 model.getName(),
-                model.getDescription()
+                model.getDescription(),
+                model.getUser().getId()
         );
     }
 

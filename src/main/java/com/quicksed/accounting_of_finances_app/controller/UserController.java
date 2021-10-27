@@ -4,52 +4,71 @@ import com.quicksed.accounting_of_finances_app.annotation.Loggable;
 import com.quicksed.accounting_of_finances_app.dto.user.UserCreateDto;
 import com.quicksed.accounting_of_finances_app.dto.user.UserDto;
 import com.quicksed.accounting_of_finances_app.dto.user.UserUpdateDto;
+import com.quicksed.accounting_of_finances_app.dto.user.UserWithRolesDto;
+import com.quicksed.accounting_of_finances_app.dto.user.filter.UserFilterDto;
 import com.quicksed.accounting_of_finances_app.service.UserService;
+import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
 
+@Loggable
 @RestController
 @RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
 
-    @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
-    @Loggable
-    @GetMapping("/userById/user/{id}")
-    public UserDto getUserById(int id) {
+    @GetMapping("/userById/{id}")
+    public UserWithRolesDto getUserById(@PathVariable("id") int id) throws NotFoundException {
         return userService.getUserById(id);
     }
 
-    @Loggable
+    @GetMapping("/userByEmail/{email}")
+    public UserWithRolesDto getUserByEmail(@PathVariable("email") String email) throws NotFoundException {
+        return userService.getUserByEmail(email);
+    }
+
+    @PostMapping
+    public List<UserWithRolesDto> getUsers(@RequestBody Collection<UserFilterDto> filters) {
+        return userService.getFilteredUsersList(filters);
+    }
+
     @GetMapping("/getAllUsers")
-    public List<UserDto> getAllUsers() {
+    public List<UserWithRolesDto> getAllUsers() {
         return userService.getAllUsers();
     }
 
-    @Loggable
-    @PostMapping("/createUser")
+    @PostMapping("/{email}/roles")
+    public void editRoles(@PathVariable String email,
+                          @RequestBody Collection<String> newRoleCodes) throws NotFoundException {
+
+        Integer userId = userService.getUserIdByEmail(email);
+        userService.editRole(userId, newRoleCodes);
+    }
+
+
+    @PostMapping("/")
     public UserDto createUser(@RequestBody UserCreateDto userCreateDto) {
         return userService.createUser(userCreateDto);
     }
 
-    @Loggable
-    @PutMapping("/update/user/{id}")
+    @PutMapping("/{id}")
     public UserDto updateUser(@RequestBody UserUpdateDto userUpdateDto,
-                              @PathVariable("id") Integer userId) {
+                              @PathVariable("id") Integer userId) throws NotFoundException {
 
         return userService.updateUser(userId, userUpdateDto);
     }
 
-    @Loggable
-    @DeleteMapping("/delete/user/{id}")
-    public void deleteUser(int id) {
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable("id") int id) throws NotFoundException {
         userService.deleteUser(id);
     }
 }

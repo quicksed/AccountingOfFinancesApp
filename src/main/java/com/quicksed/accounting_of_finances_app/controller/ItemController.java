@@ -5,51 +5,47 @@ import com.quicksed.accounting_of_finances_app.dto.item.ItemCreateDto;
 import com.quicksed.accounting_of_finances_app.dto.item.ItemDto;
 import com.quicksed.accounting_of_finances_app.dto.item.ItemUpdateDto;
 import com.quicksed.accounting_of_finances_app.service.ItemService;
+import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Loggable
 @RestController
 @RequestMapping("/items")
 public class ItemController {
 
     private final ItemService itemService;
 
-    @Autowired
     public ItemController(ItemService itemService) {
         this.itemService = itemService;
     }
 
-    @Loggable
-    @GetMapping("/getItem/{id}")
-    public ItemDto getItem(int id) {
+    @GetMapping("/{id}")
+    public ItemDto getItem(@PathVariable("id") int id) throws NotFoundException {
         return itemService.getItem(id);
     }
 
-    @Loggable
-    @GetMapping("/getAllItems")
+    @GetMapping("/")
     public List<ItemDto> getAllItems() {
         return itemService.getAllItems();
     }
 
-    @Loggable
-    @PostMapping("/createItem")
-    public ItemDto createItem(@RequestBody ItemCreateDto createItemDto) {
+    @PostMapping("/")
+    public ItemDto createItem(@RequestBody ItemCreateDto createItemDto) throws NotFoundException {
         return itemService.createItem(createItemDto);
     }
 
-    @Loggable
-    @PutMapping("/update/item/{id}")
+    @PutMapping("/{id}")
     public ItemDto updateItem(@RequestBody ItemUpdateDto itemUpdateDto,
-                              @PathVariable("id") Integer itemId) {
+                              @PathVariable("id") Integer itemId) throws NotFoundException {
 
         return itemService.updateItem(itemId, itemUpdateDto);
     }
 
-    @Loggable
-    @DeleteMapping("/delete/item/id}")
-    public void deleteAccount(int id) {
+    @DeleteMapping("/{id}")
+    public void deleteAccount(@PathVariable("id") int id) throws NotFoundException {
         itemService.deleteItem(id);
     }
 }

@@ -5,11 +5,20 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import java.time.Instant;
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
+@NamedEntityGraphs({
+        @NamedEntityGraph(name = "User.roles",
+                attributeNodes = {
+                        @NamedAttributeNode(value = "roles")
+                }
+        )
+})
 public class User {
 
     @Id
@@ -27,16 +36,31 @@ public class User {
 
     private String password;
 
-    private Date birthDate;
+    private Instant birthDate;
 
     @CreationTimestamp
-    private Date registrationDate;
+    private Instant registrationDate;
+
+    @OneToMany(mappedBy = "user")
+    private Set<Account> accounts;
+
+    @OneToMany(mappedBy = "user")
+    private Set<Category> categories;
+
+    @OneToMany(mappedBy = "user")
+    private Set<Currency> currencies;
+
+    @ManyToMany
+    @JoinTable(name = "user_role",
+            joinColumns = {@JoinColumn(name = "user_id")},
+            inverseJoinColumns = {@JoinColumn(name = "role_id")})
+    private Set<Role> roles;
 
     public User() {
 
     }
 
-    public User(String name, String surname, String email, String password, Date birthDate) {
+    public User(String name, String surname, String email, String password, Instant birthDate) {
         this.name = name;
         this.surname = surname;
         this.email = email;
