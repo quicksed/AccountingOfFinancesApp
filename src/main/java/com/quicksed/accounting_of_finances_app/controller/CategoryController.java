@@ -1,15 +1,14 @@
 package com.quicksed.accounting_of_finances_app.controller;
 
 import com.quicksed.accounting_of_finances_app.annotation.Loggable;
-import com.quicksed.accounting_of_finances_app.dto.account.AccountDto;
 import com.quicksed.accounting_of_finances_app.dto.category.CategoryCreateDto;
 import com.quicksed.accounting_of_finances_app.dto.category.CategoryDto;
 import com.quicksed.accounting_of_finances_app.dto.category.CategoryUpdateDto;
+import com.quicksed.accounting_of_finances_app.dto.user.UserWithRolesDto;
 import com.quicksed.accounting_of_finances_app.helper.RoleChecker;
 import com.quicksed.accounting_of_finances_app.service.CategoryService;
+import com.quicksed.accounting_of_finances_app.service.UserService;
 import javassist.NotFoundException;
-import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,9 +22,11 @@ import java.util.List;
 public class CategoryController {
 
     private final CategoryService categoryService;
+    private final UserService userService;
 
-    public CategoryController(CategoryService categoryService) {
+    public CategoryController(CategoryService categoryService, UserService userService) {
         this.categoryService = categoryService;
+        this.userService = userService;
     }
 
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
@@ -35,12 +36,15 @@ public class CategoryController {
             isAvailableCategoryToThisUser(id);
         }
 
-        return categoryService.getCategory(id);
+        return categoryService.getCategoryById(id);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @GetMapping("/getCategoriesByUserId/{userId}")
-    public List<CategoryDto> getUsersCategory(@PathVariable("userId") int userId) {
+    public List<CategoryDto> getUsersCategory(@PathVariable("userId") int userId) throws NotFoundException {
+        if (!RoleChecker.isAdminUser()) {
+            isAvailableCategoriesToThisUser(userId);
+        }
         return categoryService.getUsersCategories(userId);
     }
 
@@ -77,14 +81,23 @@ public class CategoryController {
         categoryService.deleteCategory(id);
     }
 
-    private boolean isAvailableCategoryToThisUser(int categoryId) throws NotFoundException {
+    private void isAvailableCategoryToThisUser(int categoryId) throws NotFoundException {
         String authenticatedUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        List<CategoryDto> categoryListByAuthenticatedUser = categoryService.getUsersCategories(authenticatedUserEmail);
 
-        if (categoryListByAuthenticatedUser.stream().noneMatch(cat -> cat.getId() == categoryId)){
+        UserWithRolesDto user = userService.getUserByEmail(authenticatedUserEmail);
+        CategoryDto account = categoryService.getCategoryById(categoryId);
+
+        if (account.getUserId() != user.getId()){
             throw new AccessDeniedException("Access denied!");
         }
+    }
 
-        return true;
+    private void isAvailableCategoriesToThisUser(int userId) throws NotFoundException {
+        String authenticatedUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserWithRolesDto user = userService.getUserById(userId);
+
+        if (!authenticatedUserEmail.equals(user.getEmail())){
+            throw new AccessDeniedException("Access denied!");
+        }
     }
 }

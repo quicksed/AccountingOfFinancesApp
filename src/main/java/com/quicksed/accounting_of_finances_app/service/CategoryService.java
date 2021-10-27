@@ -12,7 +12,7 @@ public interface CategoryService {
 
     CategoryDto createCategory(CategoryCreateDto category) throws NotFoundException;
 
-    CategoryDto getCategory(int id) throws NotFoundException;
+    CategoryDto getCategoryById(int id) throws NotFoundException;
 
     List<CategoryDto> getUsersCategories(int userId);
 

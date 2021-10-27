@@ -4,8 +4,10 @@ import com.quicksed.accounting_of_finances_app.annotation.Loggable;
 import com.quicksed.accounting_of_finances_app.dto.account.AccountCreateDto;
 import com.quicksed.accounting_of_finances_app.dto.account.AccountDto;
 import com.quicksed.accounting_of_finances_app.dto.account.AccountUpdateDto;
+import com.quicksed.accounting_of_finances_app.dto.user.UserWithRolesDto;
 import com.quicksed.accounting_of_finances_app.helper.RoleChecker;
 import com.quicksed.accounting_of_finances_app.service.AccountService;
+import com.quicksed.accounting_of_finances_app.service.UserService;
 import javassist.NotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,9 +22,11 @@ import java.util.List;
 public class AccountController {
 
     private final AccountService accountService;
+    private final UserService userService;
 
-    public AccountController(AccountService accountService) {
+    public AccountController(AccountService accountService, UserService userService) {
         this.accountService = accountService;
+        this.userService = userService;
     }
 
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
@@ -35,9 +39,13 @@ public class AccountController {
         return accountService.getAccountById(id);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @GetMapping("/getAccountsByUserId/{userId}")
-    public List<AccountDto> getUsersAccounts(@PathVariable("userId") int userId) {
+    public List<AccountDto> getUsersAccounts(@PathVariable("userId") int userId) throws NotFoundException {
+        if (!RoleChecker.isAdminUser()) {
+            isAvailableAccountsToThisUser(userId);
+        }
+
         return accountService.getUsersAccounts(userId);
     }
 
@@ -74,14 +82,23 @@ public class AccountController {
         accountService.deleteAccount(id);
     }
 
-    private boolean isAvailableAccountToThisUser(int accountId) throws NotFoundException {
+    private void isAvailableAccountToThisUser(int accountId) throws NotFoundException {
         String authenticatedUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        List<AccountDto> accountListByAuthenticatedUser = accountService.getUsersAccounts(authenticatedUserEmail);
 
-        if (accountListByAuthenticatedUser.stream().noneMatch(acc -> acc.getId() == accountId)){
+        UserWithRolesDto user = userService.getUserByEmail(authenticatedUserEmail);
+        AccountDto account = accountService.getAccountById(accountId);
+
+        if (account.getUserId() != user.getId()){
             throw new AccessDeniedException("Access denied!");
         }
+    }
 
-        return true;
+    private void isAvailableAccountsToThisUser(int userId) throws NotFoundException {
+        String authenticatedUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserWithRolesDto user = userService.getUserById(userId);
+
+        if (!authenticatedUserEmail.equals(user.getEmail())){
+            throw new AccessDeniedException("Access denied!");
+        }
     }
 }

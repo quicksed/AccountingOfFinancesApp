@@ -57,7 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Retryable(NotFoundException.class)
     @Transactional
     @Override
-    public CategoryDto getCategory(int id) throws NotFoundException {
+    public CategoryDto getCategoryById(int id) throws NotFoundException {
         Optional<Category> categoryOptional = categoryRepository.findById(id);
         Category category = OptionalChecker.checkOptional(categoryOptional);
 

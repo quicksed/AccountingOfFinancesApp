@@ -1,18 +1,14 @@
 package com.quicksed.accounting_of_finances_app.controller;
 
 import com.quicksed.accounting_of_finances_app.annotation.Loggable;
-import com.quicksed.accounting_of_finances_app.dto.account.AccountDto;
 import com.quicksed.accounting_of_finances_app.dto.user.UserCreateDto;
 import com.quicksed.accounting_of_finances_app.dto.user.UserDto;
 import com.quicksed.accounting_of_finances_app.dto.user.UserUpdateDto;
 import com.quicksed.accounting_of_finances_app.dto.user.UserWithRolesDto;
 import com.quicksed.accounting_of_finances_app.dto.user.filter.UserFilterDto;
-import com.quicksed.accounting_of_finances_app.entity.User;
 import com.quicksed.accounting_of_finances_app.helper.RoleChecker;
 import com.quicksed.accounting_of_finances_app.service.UserService;
 import javassist.NotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,15 +29,24 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @GetMapping("/userById/{id}")
     public UserWithRolesDto getUserById(@PathVariable("id") int id) throws NotFoundException {
+        if (!RoleChecker.isAdminUser()) {
+            UserWithRolesDto user = userService.getUserById(id);
+            isAvailableUserToThisUser(user.getEmail());
+        }
+
         return userService.getUserById(id);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @GetMapping("/userByEmail/{email}")
     public UserWithRolesDto getUserByEmail(@PathVariable("email") String email) throws NotFoundException {
+        if (!RoleChecker.isAdminUser()) {
+            isAvailableUserToThisUser(email);
+        }
+
         return userService.getUserByEmail(email);
     }
 
@@ -76,7 +81,8 @@ public class UserController {
     public UserDto updateUser(@RequestBody UserUpdateDto userUpdateDto,
                               @PathVariable("id") Integer userId) throws NotFoundException {
         if (!RoleChecker.isAdminUser()) {
-            isAvailableUserToThisUser();
+            UserWithRolesDto user = userService.getUserById(userId);
+            isAvailableUserToThisUser(user.getEmail());
         }
 
         return userService.updateUser(userId, userUpdateDto);
@@ -88,14 +94,11 @@ public class UserController {
         userService.deleteUser(id);
     }
 
-    private boolean isAvailableUserToThisUser() throws NotFoundException {
+    private void isAvailableUserToThisUser(String email) {
         String authenticatedUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserWithRolesDto user = userService.getUserByEmail(authenticatedUserEmail);
 
-        if (!Objects.equals(authenticatedUserEmail, user.getEmail())){
+        if (!authenticatedUserEmail.equals(email)) {
             throw new AccessDeniedException("Access denied!");
         }
-
-        return true;
     }
 }

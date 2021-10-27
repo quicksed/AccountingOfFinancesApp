@@ -31,8 +31,8 @@ public class AccountServiceImpl implements AccountService {
     private final AccountMapper accountMapper;
     private final AccountFactory accountFactory;
 
-    public AccountServiceImpl(AccountRepository accountRepository, UserRepository userRepository,
-                              CurrencyRepository currencyRepository, AccountMapper accountMapper, AccountFactory accountFactory) {
+    public AccountServiceImpl(AccountRepository accountRepository, UserRepository userRepository, CurrencyRepository currencyRepository,
+                              AccountMapper accountMapper, AccountFactory accountFactory) {
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
         this.currencyRepository = currencyRepository;
