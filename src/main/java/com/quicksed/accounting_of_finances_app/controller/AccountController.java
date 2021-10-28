@@ -33,7 +33,7 @@ public class AccountController {
     @GetMapping("/{id}")
     public AccountDto getAccount(@PathVariable("id") int id) throws NotFoundException, AccessDeniedException {
         if (!RoleChecker.isAdminUser()) {
-            isAvailableAccountToThisUser(id);
+            checkUserAccessToAccountById(id);
         }
 
         return accountService.getAccountById(id);
@@ -43,7 +43,7 @@ public class AccountController {
     @GetMapping("/getAccountsByUserId/{userId}")
     public List<AccountDto> getUsersAccounts(@PathVariable("userId") int userId) throws NotFoundException {
         if (!RoleChecker.isAdminUser()) {
-            isAvailableAccountsToThisUser(userId);
+            checkUserAccessToAccountsByUserId(userId);
         }
 
         return accountService.getUsersAccounts(userId);
@@ -66,7 +66,7 @@ public class AccountController {
     public AccountDto updateAccount(@RequestBody AccountUpdateDto accountUpdateDto,
                                     @PathVariable("id") Integer id) throws NotFoundException, AccessDeniedException {
         if (!RoleChecker.isAdminUser()) {
-            isAvailableAccountToThisUser(id);
+            checkUserAccessToAccountById(id);
         }
 
         return accountService.updateAccount(id, accountUpdateDto);
@@ -76,13 +76,13 @@ public class AccountController {
     @DeleteMapping("/{id}")
     public void deleteAccount(@PathVariable("id") int id) throws NotFoundException {
         if (!RoleChecker.isAdminUser()) {
-            isAvailableAccountToThisUser(id);
+            checkUserAccessToAccountById(id);
         }
 
         accountService.deleteAccount(id);
     }
 
-    private void isAvailableAccountToThisUser(int accountId) throws NotFoundException {
+    private void checkUserAccessToAccountById(int accountId) throws NotFoundException {
         String authenticatedUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 
         UserWithRolesDto user = userService.getUserByEmail(authenticatedUserEmail);
@@ -93,7 +93,7 @@ public class AccountController {
         }
     }
 
-    private void isAvailableAccountsToThisUser(int userId) throws NotFoundException {
+    private void checkUserAccessToAccountsByUserId(int userId) throws NotFoundException {
         String authenticatedUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         UserWithRolesDto user = userService.getUserById(userId);
 

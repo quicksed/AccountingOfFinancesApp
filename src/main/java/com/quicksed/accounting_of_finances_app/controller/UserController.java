@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 @Loggable
 @RestController
@@ -34,7 +33,7 @@ public class UserController {
     public UserWithRolesDto getUserById(@PathVariable("id") int id) throws NotFoundException {
         if (!RoleChecker.isAdminUser()) {
             UserWithRolesDto user = userService.getUserById(id);
-            isAvailableUserToThisUser(user.getEmail());
+            checkUserAccessByEmail(user.getEmail());
         }
 
         return userService.getUserById(id);
@@ -44,7 +43,7 @@ public class UserController {
     @GetMapping("/userByEmail/{email}")
     public UserWithRolesDto getUserByEmail(@PathVariable("email") String email) throws NotFoundException {
         if (!RoleChecker.isAdminUser()) {
-            isAvailableUserToThisUser(email);
+            checkUserAccessByEmail(email);
         }
 
         return userService.getUserByEmail(email);
@@ -82,7 +81,7 @@ public class UserController {
                               @PathVariable("id") Integer userId) throws NotFoundException {
         if (!RoleChecker.isAdminUser()) {
             UserWithRolesDto user = userService.getUserById(userId);
-            isAvailableUserToThisUser(user.getEmail());
+            checkUserAccessByEmail(user.getEmail());
         }
 
         return userService.updateUser(userId, userUpdateDto);
@@ -94,7 +93,7 @@ public class UserController {
         userService.deleteUser(id);
     }
 
-    private void isAvailableUserToThisUser(String email) {
+    private void checkUserAccessByEmail(String email) {
         String authenticatedUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 
         if (!authenticatedUserEmail.equals(email)) {

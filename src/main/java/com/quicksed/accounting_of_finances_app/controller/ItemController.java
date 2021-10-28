@@ -4,7 +4,6 @@ import com.quicksed.accounting_of_finances_app.annotation.Loggable;
 import com.quicksed.accounting_of_finances_app.dto.item.ItemCreateDto;
 import com.quicksed.accounting_of_finances_app.dto.item.ItemDto;
 import com.quicksed.accounting_of_finances_app.dto.item.ItemUpdateDto;
-import com.quicksed.accounting_of_finances_app.dto.user.UserWithRolesDto;
 import com.quicksed.accounting_of_finances_app.helper.RoleChecker;
 import com.quicksed.accounting_of_finances_app.service.ItemService;
 import com.quicksed.accounting_of_finances_app.service.UserService;
@@ -33,7 +32,7 @@ public class ItemController {
     @GetMapping("/{id}")
     public ItemDto getItem(@PathVariable("id") int id) throws NotFoundException {
         if (!RoleChecker.isAdminUser()){
-            isAvailableItemToThisUser(id);
+            checkUserAccessToItemById(id);
         }
 
         return itemService.getItem(id);
@@ -43,7 +42,7 @@ public class ItemController {
     @GetMapping("/getUserItemByEmail/{email}")
     public List<ItemDto> getUserItemByEmail(@PathVariable("email") String email) {
         if (!RoleChecker.isAdminUser()) {
-            isAvailableItemsToThisUser(email);
+            checkUserAccessToItemsByUserEmail(email);
         }
 
         return itemService.getUserItemsByEmail(email);
@@ -74,7 +73,7 @@ public class ItemController {
         itemService.deleteItem(id);
     }
 
-    private void isAvailableItemToThisUser(int itemId) {
+    private void checkUserAccessToItemById(int itemId) {
         String authenticatedUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         List<ItemDto> itemListByAuthenticatedUser = itemService.getUserItemsByEmail(authenticatedUserEmail);
 
@@ -83,7 +82,7 @@ public class ItemController {
         }
     }
 
-    private void isAvailableItemsToThisUser(String email) {
+    private void checkUserAccessToItemsByUserEmail(String email) {
         String authenticatedUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 
         if (!authenticatedUserEmail.equals(email)){

@@ -33,7 +33,7 @@ public class CategoryController {
     @GetMapping("/{id}")
     public CategoryDto getCategory(@PathVariable("id") int id) throws NotFoundException, AccessDeniedException {
         if (!RoleChecker.isAdminUser()) {
-            isAvailableCategoryToThisUser(id);
+            checkUserAccessToCategoryById(id);
         }
 
         return categoryService.getCategoryById(id);
@@ -43,7 +43,7 @@ public class CategoryController {
     @GetMapping("/getCategoriesByUserId/{userId}")
     public List<CategoryDto> getUsersCategory(@PathVariable("userId") int userId) throws NotFoundException {
         if (!RoleChecker.isAdminUser()) {
-            isAvailableCategoriesToThisUser(userId);
+            checkUserAccessToCategoriesByUserId(userId);
         }
         return categoryService.getUsersCategories(userId);
     }
@@ -65,7 +65,7 @@ public class CategoryController {
     public CategoryDto updateCategory(@RequestBody CategoryUpdateDto categoryUpdateDto,
                                       @PathVariable("id") Integer id) throws NotFoundException, AccessDeniedException {
         if (!RoleChecker.isAdminUser()) {
-            isAvailableCategoryToThisUser(id);
+            checkUserAccessToCategoryById(id);
         }
 
         return categoryService.updateCategory(id, categoryUpdateDto);
@@ -75,13 +75,13 @@ public class CategoryController {
     @DeleteMapping("/{id}")
     public void deleteCategory(@PathVariable("id") int id) throws NotFoundException {
         if (!RoleChecker.isAdminUser()) {
-            isAvailableCategoryToThisUser(id);
+            checkUserAccessToCategoryById(id);
         }
 
         categoryService.deleteCategory(id);
     }
 
-    private void isAvailableCategoryToThisUser(int categoryId) throws NotFoundException {
+    private void checkUserAccessToCategoryById(int categoryId) throws NotFoundException {
         String authenticatedUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 
         UserWithRolesDto user = userService.getUserByEmail(authenticatedUserEmail);
@@ -92,7 +92,7 @@ public class CategoryController {
         }
     }
 
-    private void isAvailableCategoriesToThisUser(int userId) throws NotFoundException {
+    private void checkUserAccessToCategoriesByUserId(int userId) throws NotFoundException {
         String authenticatedUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         UserWithRolesDto user = userService.getUserById(userId);
 

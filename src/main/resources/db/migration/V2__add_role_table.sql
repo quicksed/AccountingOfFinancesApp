@@ -16,4 +16,5 @@ CREATE TABLE accounting.user_role
     Role_id     INT NOT NULL REFERENCES accounting.role (ID)
 );
 
-CREATE UNIQUE index user_email_uniq_idx ON accounting.user (email);
+CREATE UNIQUE index user_email_uniq_idx ON accounting.user (Email);
+CREATE UNIQUE index currency_name_uniq_idx ON accounting.currency (Name);
