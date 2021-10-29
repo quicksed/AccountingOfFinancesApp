@@ -3,8 +3,10 @@ package com.quicksed.accounting_of_finances_app.service.implementation;
 import com.quicksed.accounting_of_finances_app.dto.category.CategoryCreateDto;
 import com.quicksed.accounting_of_finances_app.dto.category.CategoryDto;
 import com.quicksed.accounting_of_finances_app.dto.category.CategoryUpdateDto;
+import com.quicksed.accounting_of_finances_app.entity.Account;
 import com.quicksed.accounting_of_finances_app.entity.Category;
 import com.quicksed.accounting_of_finances_app.entity.User;
+import com.quicksed.accounting_of_finances_app.helper.OptionalChecker;
 import com.quicksed.accounting_of_finances_app.repository.CategoryRepository;
 import com.quicksed.accounting_of_finances_app.repository.UserRepository;
 import com.quicksed.accounting_of_finances_app.service.CategoryService;
@@ -39,16 +41,13 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     @Override
     public CategoryDto createCategory(CategoryCreateDto categoryCreateDto) throws NotFoundException {
-        Optional<User> user = userRepository.findById(categoryCreateDto.getUserId());
-
-        if (user.isEmpty()) {
-            throw new NotFoundException("User not found!");
-        }
+        Optional<User> userOptional = userRepository.findById(categoryCreateDto.getUserId());
+        User user = OptionalChecker.checkOptional(userOptional);
 
         Category category = categoryFactory.build(
                 categoryCreateDto.getName(),
                 categoryCreateDto.getCategoryType(),
-                user.get()
+                user
         );
 
         category = categoryRepository.saveAndFlush(category);
@@ -58,20 +57,26 @@ public class CategoryServiceImpl implements CategoryService {
     @Retryable(NotFoundException.class)
     @Transactional
     @Override
-    public CategoryDto getCategory(int id) throws NotFoundException {
-        Optional<Category> category = categoryRepository.findById(id);
+    public CategoryDto getCategoryById(int id) throws NotFoundException {
+        Optional<Category> categoryOptional = categoryRepository.findById(id);
+        Category category = OptionalChecker.checkOptional(categoryOptional);
 
-        if (category.isEmpty()) {
-            throw new NotFoundException("Category not found!");
-        }
-
-        return categoryMapper.mapCategoryToCategoryDto(category.get());
+        return categoryMapper.mapCategoryToCategoryDto(category);
     }
 
     @Transactional
     @Override
     public List<CategoryDto> getUsersCategories(int userId) {
         List<Category> categories = categoryRepository.findByUserId(userId);
+        return categoryMapper.mapCategoryToCategoryDto(categories);
+    }
+
+    @Override
+    public List<CategoryDto> getUsersCategories(String userEmail) throws NotFoundException {
+        Optional<User> userOptional = userRepository.findByEmail(userEmail);
+        User user = OptionalChecker.checkOptional(userOptional);
+
+        List<Category> categories = categoryRepository.findByUserId(user.getId());
         return categoryMapper.mapCategoryToCategoryDto(categories);
     }
 
@@ -87,12 +92,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto updateCategory(int id, CategoryUpdateDto categoryUpdateDto) throws NotFoundException {
         Optional<Category> categoryOptional = categoryRepository.findById(id);
-
-        if (categoryOptional.isEmpty()) {
-            throw new NotFoundException("Category not found!");
-        }
-
-        Category category = categoryOptional.get();
+        Category category = OptionalChecker.checkOptional(categoryOptional);
 
         category.setName(categoryUpdateDto.getName());
         category.setCategoryType(categoryUpdateDto.getCategoryType());
@@ -105,12 +105,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     @Override
     public void deleteCategory(int id) throws NotFoundException {
-        Optional<Category> category = categoryRepository.findById(id);
+        Optional<Category> categoryOptional = categoryRepository.findById(id);
+        Category category = OptionalChecker.checkOptional(categoryOptional);
 
-        if (category.isEmpty()) {
-            throw new NotFoundException("Category not found!");
-        }
-
-        categoryRepository.delete(category.get());
+        categoryRepository.delete(category);
     }
 }

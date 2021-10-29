@@ -13,9 +13,11 @@ public interface AccountService {
 
     AccountDto getAccountById(int id) throws NotFoundException;
 
-    List<AccountDto> getAllAccounts();
-
     List<AccountDto> getUsersAccounts(int userId);
+
+    List<AccountDto> getUsersAccounts(String userEmail) throws NotFoundException;
+
+    List<AccountDto> getAllAccounts();
 
     AccountDto updateAccount(int id, AccountUpdateDto account) throws NotFoundException;
 

@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum CategoryType {
+
     Income(1, "Income"),
     Consumption(2, "Consumption");
 

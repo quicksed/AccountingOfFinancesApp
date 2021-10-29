@@ -6,6 +6,7 @@ import com.quicksed.accounting_of_finances_app.dto.item.ItemUpdateDto;
 import com.quicksed.accounting_of_finances_app.entity.Account;
 import com.quicksed.accounting_of_finances_app.entity.Category;
 import com.quicksed.accounting_of_finances_app.entity.Item;
+import com.quicksed.accounting_of_finances_app.helper.OptionalChecker;
 import com.quicksed.accounting_of_finances_app.repository.AccountRepository;
 import com.quicksed.accounting_of_finances_app.repository.CategoryRepository;
 import com.quicksed.accounting_of_finances_app.repository.ItemRepository;
@@ -42,27 +43,22 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Retryable(NotFoundException.class)
-    @Transactional(isolation = Isolation.READ_COMMITTED)
+    @Transactional
     @Override
     public ItemDto createItem(ItemCreateDto itemCreateDto) throws NotFoundException {
-        Optional<Account> account = accountRepository.findById(itemCreateDto.getAccountId());
-        Optional<Category> category = categoryRepository.findById(itemCreateDto.getCategoryId());
+        Optional<Account> accountOptional = accountRepository.findById(itemCreateDto.getAccountId());
+        Optional<Category> categoryOptional = categoryRepository.findById(itemCreateDto.getCategoryId());
 
-        if (account.isEmpty()) {
-            throw new NotFoundException("Account not found!");
-        }
-
-        if (category.isEmpty()) {
-            throw new NotFoundException("Category not found!");
-        }
+        Account account = OptionalChecker.checkOptional(accountOptional);
+        Category category = OptionalChecker.checkOptional(categoryOptional);
 
         Item item = itemFactory.build(
                 itemCreateDto.getName(),
                 itemCreateDto.getDate(),
                 itemCreateDto.getValue(),
                 itemCreateDto.getComment(),
-                account.get(),
-                category.get()
+                account,
+                category
         );
 
         item = itemRepository.save(item);
@@ -73,13 +69,16 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     @Override
     public ItemDto getItem(int id) throws NotFoundException {
-        Optional<Item> item = itemRepository.findById(id);
+        Optional<Item> itemOptional = itemRepository.findById(id);
+        Item item = OptionalChecker.checkOptional(itemOptional);
 
-        if (item.isEmpty()) {
-            throw new NotFoundException("Item not found!");
-        }
+        return itemMapper.mapItemToItemDto(item);
+    }
 
-        return itemMapper.mapItemToItemDto(item.get());
+    @Override
+    public List<ItemDto> getUserItemsByEmail(String email) {
+        List<Item> items = itemRepository.findUserItemsByEmail(email);
+        return itemMapper.mapItemToItemDto(items);
     }
 
     @Transactional
@@ -94,12 +93,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto updateItem(int id, ItemUpdateDto itemUpdateDto) throws NotFoundException {
         Optional<Item> itemOptional = itemRepository.findById(id);
-
-        if (itemOptional.isEmpty()) {
-            throw new NotFoundException("Item not found!");
-        }
-
-        Item item = itemOptional.get();
+        Item item = OptionalChecker.checkOptional(itemOptional);
 
         item.setName(itemUpdateDto.getName());
         item.setDate(itemUpdateDto.getDate());
@@ -114,12 +108,9 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     @Override
     public void deleteItem(int id) throws NotFoundException {
-        Optional<Item> item = itemRepository.findById(id);
+        Optional<Item> itemOptional = itemRepository.findById(id);
+        Item item = OptionalChecker.checkOptional(itemOptional);
 
-        if (item.isEmpty()) {
-            throw new NotFoundException("Item not found!");
-        }
-
-        itemRepository.delete(item.get());
+        itemRepository.delete(item);
     }
 }

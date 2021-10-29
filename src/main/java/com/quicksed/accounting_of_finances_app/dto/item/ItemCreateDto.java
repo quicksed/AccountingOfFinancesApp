@@ -4,20 +4,21 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
+import java.time.Instant;
 import java.util.Date;
 
 @Getter
 public class ItemCreateDto {
 
     private final String name;
-    private final Date date;
+    private final Instant date;
     private final Double value;
     private final String comment;
     private final Integer accountId;
     private final Integer categoryId;
 
     public ItemCreateDto(@JsonProperty("name") String name,
-                         @JsonProperty("date") Date date,
+                         @JsonProperty("date") Instant date,
                          @JsonProperty("value") Double value,
                          @JsonProperty("comment") String comment,
                          @JsonProperty("accountId") Integer accountId,

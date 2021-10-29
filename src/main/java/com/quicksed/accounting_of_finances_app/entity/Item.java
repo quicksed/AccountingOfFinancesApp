@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.Instant;
 import java.util.Date;
 
 @Entity
@@ -20,7 +21,7 @@ public class Item {
 
     private String name;
 
-    private Date date;
+    private Instant date;
 
     @Column(columnDefinition = "NUMERIC(10,2)")
     private Double value;
@@ -35,12 +36,11 @@ public class Item {
     @JoinColumn(name = "category_id")
     private Category category;
 
-
     public Item() {
 
     }
 
-    public Item(String name, Date date, Double value, String comment, Account account, Category category) {
+    public Item(String name, Instant date, Double value, String comment, Account account, Category category) {
         this.name = name;
         this.date = date;
         this.value = value;

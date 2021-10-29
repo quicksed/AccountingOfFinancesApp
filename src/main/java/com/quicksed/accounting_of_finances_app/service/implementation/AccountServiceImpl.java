@@ -6,6 +6,7 @@ import com.quicksed.accounting_of_finances_app.dto.account.AccountUpdateDto;
 import com.quicksed.accounting_of_finances_app.entity.Account;
 import com.quicksed.accounting_of_finances_app.entity.Currency;
 import com.quicksed.accounting_of_finances_app.entity.User;
+import com.quicksed.accounting_of_finances_app.helper.OptionalChecker;
 import com.quicksed.accounting_of_finances_app.repository.AccountRepository;
 import com.quicksed.accounting_of_finances_app.repository.CurrencyRepository;
 import com.quicksed.accounting_of_finances_app.repository.UserRepository;
@@ -30,8 +31,8 @@ public class AccountServiceImpl implements AccountService {
     private final AccountMapper accountMapper;
     private final AccountFactory accountFactory;
 
-    public AccountServiceImpl(AccountRepository accountRepository, UserRepository userRepository,
-                              CurrencyRepository currencyRepository, AccountMapper accountMapper, AccountFactory accountFactory) {
+    public AccountServiceImpl(AccountRepository accountRepository, UserRepository userRepository, CurrencyRepository currencyRepository,
+                              AccountMapper accountMapper, AccountFactory accountFactory) {
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
         this.currencyRepository = currencyRepository;
@@ -43,23 +44,17 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     @Override
     public AccountDto createAccount(AccountCreateDto accountCreateDto) throws NotFoundException {
+        Optional<User> userOptional = userRepository.findById(accountCreateDto.getUserId());
+        Optional<Currency> currencyOptional = currencyRepository.findById(accountCreateDto.getUserId());
 
-        Optional<User> user = userRepository.findById(accountCreateDto.getUserId());
-        Optional<Currency> currency = currencyRepository.findById(accountCreateDto.getUserId());
-
-        if (user.isEmpty()) {
-            throw new NotFoundException("User not found!");
-        }
-
-        if (currency.isEmpty()) {
-            throw new NotFoundException("Currency not found!");
-        }
+        User user = OptionalChecker.checkOptional(userOptional);
+        Currency currency = OptionalChecker.checkOptional(currencyOptional);
 
         Account account = accountFactory.build(
                 accountCreateDto.getName(),
                 accountCreateDto.getDescription(),
-                user.get(),
-                currency.get()
+                user,
+                currency
         );
 
         account = accountRepository.save(account);
@@ -70,27 +65,31 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     @Override
     public AccountDto getAccountById(int id) throws NotFoundException {
-        Optional<Account> account = accountRepository.findById(id);
+        Optional<Account> accountOptional = accountRepository.findById(id);
+        Account account = OptionalChecker.checkOptional(accountOptional);
 
-        if (account.isEmpty()) {
-            throw new NotFoundException("Account not found!");
-        }
-
-        return accountMapper.mapAccountToAccountDto(account.get());
+        return accountMapper.mapAccountToAccountDto(account);
     }
 
     @Transactional
     @Override
     public List<AccountDto> getUsersAccounts(int userId) {
-
         List<Account> accounts = accountRepository.findByUserId(userId);
+        return accountMapper.mapAccountToAccountDto(accounts);
+    }
+
+    @Override
+    public List<AccountDto> getUsersAccounts(String userEmail) throws NotFoundException {
+        Optional<User> userOptional = userRepository.findByEmail(userEmail);
+        User user = OptionalChecker.checkOptional(userOptional);
+
+        List<Account> accounts = accountRepository.findByUserId(user.getId());
         return accountMapper.mapAccountToAccountDto(accounts);
     }
 
     @Transactional
     @Override
     public List<AccountDto> getAllAccounts() {
-
         List<Account> accounts = accountRepository.findAll();
         return accountMapper.mapAccountToAccountDto(accounts);
     }
@@ -99,14 +98,9 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     @Override
     public AccountDto updateAccount(int id, AccountUpdateDto accountUpdate) throws NotFoundException {
-
         Optional<Account> accountOptional = accountRepository.findById(id);
+        Account account = OptionalChecker.checkOptional(accountOptional);
 
-        if (accountOptional.isEmpty()) {
-            throw new NotFoundException("Account not found!");
-        }
-
-        Account account = accountOptional.get();
         account.setName(accountUpdate.getName());
         account.setDescription(accountUpdate.getDescription());
 
@@ -118,13 +112,9 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     @Override
     public void deleteAccount(int id) throws NotFoundException {
+        Optional<Account> accountOptional = accountRepository.findById(id);
+        Account account = OptionalChecker.checkOptional(accountOptional);
 
-        Optional<Account> account = accountRepository.findById(id);
-
-        if (account.isEmpty()) {
-            throw new NotFoundException("Account not found!");
-        }
-
-        accountRepository.delete(account.get());
+        accountRepository.delete(account);
     }
 }

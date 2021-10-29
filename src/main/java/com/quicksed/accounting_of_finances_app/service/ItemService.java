@@ -13,6 +13,8 @@ public interface ItemService {
 
     ItemDto getItem(int id) throws NotFoundException;
 
+    List<ItemDto> getUserItemsByEmail(String email);
+
     List<ItemDto> getAllItems();
 
     ItemDto updateItem(int id, ItemUpdateDto item) throws NotFoundException;

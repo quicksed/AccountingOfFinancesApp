@@ -6,4 +6,5 @@ import org.springframework.retry.annotation.EnableRetry;
 @EnableRetry
 @Configuration
 public class CoreConfig {
+
 }
